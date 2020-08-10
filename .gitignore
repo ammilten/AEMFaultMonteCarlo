@@ -1,3 +1,4 @@
 *.ipynb
 *.pyc
+!notebooks/plot_fwd_3_tem_3d_PH.ipynb
 *.dat
