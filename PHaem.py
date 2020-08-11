@@ -195,7 +195,7 @@ class PHaem:
         timegates = pd.read_csv(self.tfile,sep='   ', engine='python')
 
         def wave_function(t):
-            wfile = '/home/ammilten/Documents/LBNL/AEM/Raw/waveform.txt'
+            wfile = 'data/waveform.txt'
             wave = pd.read_csv(wfile,sep=' ')
             if t < wave.Time.values[0] or t > wave.Time.values[wave.Time.values.shape[0]-1]:
                 val = 0
