@@ -50,7 +50,7 @@ def get_args(argv):
         MCfolder = MCfolder+'/'
 
     print("MCfolder = "+MCfolder)
-    print("Max Spacing = " + str(dh) + "meters")
+    print("Max Spacing = " + str(dh) + " meters")
     print("Number of realizations = " + str(N))
     if parallel:
         if nproc is None:

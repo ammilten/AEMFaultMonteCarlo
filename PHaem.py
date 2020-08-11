@@ -117,7 +117,7 @@ def createMesh(topo_xyz, x, dh=25.0, y0=100):
 
 # -------------- Simulate --------------------
 def runSim(mesh, survey, model, model_map, t0, time_steps, outfile=None):
-    
+
     simulation = tdem.simulation.Simulation3DMagneticFluxDensity(
         mesh, survey=survey, sigmaMap=model_map, Solver=Solver, t0=t0
     )
@@ -371,7 +371,7 @@ class PHaem:
         return
        
     def simulate(self):
-        self.data = runSim(self.mesh, self.survey, self.model, self.model_map, self.t0, self.time_steps, outfile=None)
+        self.data = runSim(self.mesh, self.survey, self.model, self.model_map, self.t0, self.time_steps, outfile=self.outfile)
         return self.data
 
     def plot_data(self, vmin=0, vmax=1e-10, shading='auto'):
