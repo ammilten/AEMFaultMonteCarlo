@@ -1,4 +1,5 @@
 *.ipynb
 *.pyc
 !notebooks/plot_fwd_3_tem_3d_PH.ipynb
+!notebooks/AEM Simulation.ipynb
 *.dat
