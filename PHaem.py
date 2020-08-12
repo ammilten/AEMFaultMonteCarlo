@@ -113,12 +113,12 @@ def createMesh(topo_xyz, x, dh=25.0, y0=100):
 
     # Mesh refinement based on topography
     mesh = refine_tree_xyz(
-        mesh, topo_xyz, octree_levels=[0, 0, 0, 1], method="surface", finalize=False
+        mesh, topo_xyz, octree_levels=[2], method="surface", finalize=False
     )
 
     # Mesh refinement near transmitters and receivers
     mesh = refine_tree_xyz(
-        mesh, receiver_locations, octree_levels=[2, 4], method="radial", finalize=False
+        mesh, receiver_locations, octree_levels=[4], method="radial", finalize=False
     )
 
     # Refine core mesh region
@@ -151,7 +151,7 @@ def runSim(mesh, survey, model, model_map, t0, time_steps, outfile=None):
     return dpred_plotting
 
 class PHaem:
-    def __init__(self, dip=60, H=100, xpos=250, rho_fault=30, rho_back=50, efile=None, efile2=None, sfile=None, dfile=None, tfile=None, wfile=None, dh=25.0, y0=100, ny=11, dep=1000, xtra=500, outfile=None):
+    def __init__(self, dip=60, H=100, xpos=400, rho_fault=30, rho_back=50, efile=None, efile2=None, sfile=None, dfile=None, tfile=None, wfile=None, dh=25.0, y0=100, ny=11, dep=1000, xtra=1000, outfile=None):
         self.dep = dep
         self.dip = dip
         self.H = H
