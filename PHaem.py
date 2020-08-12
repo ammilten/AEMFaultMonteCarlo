@@ -257,7 +257,7 @@ class PHaem:
         nbcz = 2 ** int(np.round(np.log(dom_vert / self.dh) / np.log(2.0)))  # num. base cells
 
         # Define the base mesh
-        mesh = TreeMesh([[(self.dh, nbcx)], [(self.dh, nbcy)], [(self.dh, nbcz)]], x0=[0, -self.y0, 2000])
+        mesh = TreeMesh([[(self.dh, nbcx)], [(self.dh, nbcy)], [(self.dh, nbcz)]], x0=[0, -self.y0, np.min(topo[:,1])-self.dep])
 
         # Mesh refinement based on topography
         mesh = refine_tree_xyz(
