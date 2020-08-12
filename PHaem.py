@@ -252,12 +252,15 @@ class PHaem:
         dom_width = topo[topo.shape[0]-1,0]  # domain width
         dom_len = 2*self.y0
         dom_vert = np.min(topo[:,1]) - self.dep
+
+        dhy = dom_len / (self.ny-1)
+
         nbcx = 2 ** int(np.round(np.log(dom_width / self.dh) / np.log(2.0)))  # num. base cells
-        nbcy = 2 ** int(np.round(np.log(dom_len / self.dh) / np.log(2.0)))  # num. base cells
+        nbcy = 2 ** int(np.round(np.log(dom_len / dhy) / np.log(2.0)))  # num. base cells
         nbcz = 2 ** int(np.round(np.log(dom_vert / self.dh) / np.log(2.0)))  # num. base cells
 
         # Define the base mesh
-        mesh = TreeMesh([[(self.dh, nbcx)], [(self.dh, nbcy)], [(self.dh, nbcz)]], x0=[0, -self.y0, np.min(topo[:,1])-self.dep])
+        mesh = TreeMesh([[(self.dh, nbcx)], [(dhy, nbcy)], [(self.dh, nbcz)]], x0=[0, -self.y0, np.min(topo[:,1])-self.dep])
 
         # Mesh refinement based on topography
         mesh = refine_tree_xyz(
