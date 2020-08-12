@@ -98,40 +98,6 @@ def refineFault(fpts, nr=100):
 
     fpts_refine = np.concatenate((np.array([xr1,yr1]).T, fpts[1:end-1,:], np.array([xr2,yr2]).T))
     return fpts_refine
-
-# ---------- Create mesh ---------------------
-def createMesh(topo_xyz, x, dh=25.0, y0=100):
-    dom_width = x[x.shape[0]-1]  # domain width
-    dom_len = 2*y0
-    dom_vert = 1600
-    nbcx = 2 ** int(np.round(np.log(dom_width / dh) / np.log(2.0)))  # num. base cells
-    nbcy = 2 ** int(np.round(np.log(dom_len / dh) / np.log(2.0)))  # num. base cells
-    nbcz = 2 ** int(np.round(np.log(dom_vert / dh) / np.log(2.0)))  # num. base cells
-
-    # Define the base mesh
-    mesh = TreeMesh([[(dh, nbcx)], [(dh, nbcy)], [(dh, nbcz)]], x0=[0, -y0, 2000])
-
-    # Mesh refinement based on topography
-    mesh = refine_tree_xyz(
-        mesh, topo_xyz, octree_levels=[2], method="surface", finalize=False
-    )
-
-    # Mesh refinement near transmitters and receivers
-    mesh = refine_tree_xyz(
-        mesh, receiver_locations, octree_levels=[4], method="radial", finalize=False
-    )
-
-    # Refine core mesh region
-    xz = np.repeat(np.array(fpts),mesh.vectorCCy.shape[0],axis=0)
-    ys = np.concatenate(tuple([np.repeat(mesh.vectorCCy[i],len(fpts)) for i in range(mesh.vectorCCy.shape[0])]))
-    xyz = np.concatenate((xz[:,0][:,np.newaxis], ys[:,np.newaxis], xz[:,1][:,np.newaxis]),axis=1)
-
-    mesh = refine_tree_xyz(mesh, xyz, octree_levels=[0, 2, 4], method="box", finalize=False)
-
-    mesh.finalize()
-
-    return mesh
-
 # -------------- Simulate --------------------
 def runSim(mesh, survey, model, model_map, t0, time_steps, outfile=None):
 
@@ -295,12 +261,12 @@ class PHaem:
 
         # Mesh refinement based on topography
         mesh = refine_tree_xyz(
-            mesh, self.topo_xyz, octree_levels=[0, 0, 0, 1], method="surface", finalize=False
+            mesh, self.topo_xyz, octree_levels=[2], method="surface", finalize=False
         )
 
         # Mesh refinement near transmitters and receivers
         mesh = refine_tree_xyz(
-            mesh, self.receiver_locations, octree_levels=[2, 4], method="radial", finalize=False
+            mesh, self.receiver_locations, octree_levels=[4], method="radial", finalize=False
         )
 
         # Refine core mesh region
