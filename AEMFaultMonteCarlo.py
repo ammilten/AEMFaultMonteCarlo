@@ -87,7 +87,7 @@ if __name__ == "__main__":
 
     dep = 1000
     xtra = 1000
-    ny = 11
+    ny = 3
     y0 = 100
 
     if imp:

@@ -110,11 +110,13 @@ def runSim(mesh, survey, model, model_map, t0, time_steps, outfile=None):
     dpred = simulation.dpred(model)
     
     dpred_plotting = np.reshape(dpred, (survey.nSrc, int(dpred.shape[0]/survey.nSrc)))
+
+    dpred_save = np.abs(dpred_plotting.T)
     
     if outfile is not None:
-        np.savetxt(outfile, dpred_plotting, delimiter=",")
+        np.savetxt(outfile, dpred_save, delimiter=",")
 
-    return dpred_plotting
+    return dpred_save
 
 class PHaem:
     def __init__(self, dip=60, H=100, xpos=400, rho_fault=30, rho_back=50, efile=None, efile2=None, sfile=None, dfile=None, tfile=None, wfile=None, dh=25.0, y0=100, ny=11, dep=1000, xtra=1000, outfile=None):
@@ -365,9 +367,9 @@ class PHaem:
         xv,yv = np.meshgrid(self.receiver_locations[:,0],self.time_channels)
         
         if vmin is None and vmax is None:
-            plt.pcolormesh(xv/1000,yv,np.abs(self.data.T),shading=shading)
+            plt.pcolormesh(xv/1000,yv,self.data,shading=shading)
         else:
-            plt.pcolormesh(xv/1000,yv,np.abs(self.data.T),vmin=vmin,vmax=vmax,shading=shading)
+            plt.pcolormesh(xv/1000,yv,self.data,vmin=vmin,vmax=vmax,shading=shading)
 
         plt.gca().invert_yaxis()
         cb=plt.colorbar()
