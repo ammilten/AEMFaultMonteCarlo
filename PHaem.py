@@ -82,6 +82,23 @@ def createFault(topo, xpos, H, dip, dep, xtra=1000):
 
     return verts
 
+## -------- Refine Fault Polygon -------------
+def refineFault(fpts, nr=100):
+    m1 = (fpts[1,1]-fpts[0,1]) / (fpts[1,0]-fpts[0,0])
+    b1 = fpts[0,1] - fpts[0,0] * m1
+
+    end = fpts.shape[0]-1
+    m2 = (fpts[end,1]-fpts[end-1,1]) / (fpts[end,0]-fpts[end-1,0])
+    b2 = fpts[end,1] - fpts[end,0] * m2
+
+    xr1 = np.linspace(fpts[0,0], fpts[1,0],nr)
+    xr2 = np.linspace(fpts[end-1,0], fpts[end,0],nr)
+    yr1 = xr1 * m1 + b1
+    yr2 = xr2 * m2 + b2
+
+    fpts_refine = np.concatenate((np.array([xr1,yr1]).T, fpts[1:end-1,:], np.array([xr2,yr2]).T))
+    return fpts_refine
+
 # ---------- Create mesh ---------------------
 def createMesh(topo_xyz, x, dh=25.0, y0=100):
     dom_width = x[x.shape[0]-1]  # domain width
@@ -287,12 +304,13 @@ class PHaem:
         )
 
         # Refine core mesh region
-        self.fpts = createFault(topo, self.xpos, self.H, self.dip, self.dep, xtra=1000)
-        xz = np.repeat(np.array(self.fpts),mesh.vectorCCy.shape[0],axis=0)
-        ys = np.concatenate(tuple([np.repeat(mesh.vectorCCy[i],len(self.fpts)) for i in range(mesh.vectorCCy.shape[0])]))
+        fpts = createFault(topo, self.xpos, self.H, self.dip, self.dep, xtra=1000)
+        self.fpts = refineFault(np.array(fpts))
+        xz = np.repeat(self.fpts,mesh.vectorCCy.shape[0],axis=0)
+        ys = np.concatenate(tuple([np.repeat(mesh.vectorCCy[i],self.fpts.shape[0]) for i in range(mesh.vectorCCy.shape[0])]))
         xyz = np.concatenate((xz[:,0][:,np.newaxis], ys[:,np.newaxis], xz[:,1][:,np.newaxis]),axis=1)
 
-        mesh = refine_tree_xyz(mesh, xyz, octree_levels=[0, 2, 4], method="box", finalize=False)
+        mesh = refine_tree_xyz(mesh, xyz, octree_levels=[4], method="radial", finalize=False)
 
         mesh.finalize()
         self.mesh = mesh
@@ -374,9 +392,14 @@ class PHaem:
         self.data = runSim(self.mesh, self.survey, self.model, self.model_map, self.t0, self.time_steps, outfile=self.outfile)
         return self.data
 
-    def plot_data(self, vmin=0, vmax=1e-10, shading='auto'):
+    def plot_data(self, vmin=None, vmax=None, shading='auto'):
         xv,yv = np.meshgrid(self.receiver_locations[:,0],self.time_channels)
-        plt.pcolormesh(xv/1000,yv,np.abs(self.data.T),vmin=vmin,vmax=vmax,shading=shading)
+        
+        if vmin is None and vmax is None:
+            plt.pcolormesh(xv/1000,yv,np.abs(self.data.T),shading=shading)
+        else:
+            plt.pcolormesh(xv/1000,yv,np.abs(self.data.T),vmin=vmin,vmax=vmax,shading=shading)
+
         plt.gca().invert_yaxis()
         cb=plt.colorbar()
         cb.ax.set_ylabel('dB/dt')
