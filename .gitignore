@@ -4,3 +4,4 @@
 !AEM Simulation.ipynb
 *.dat
 *.pkl
+notebooks/*
