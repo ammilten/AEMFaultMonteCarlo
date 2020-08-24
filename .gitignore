@@ -3,3 +3,4 @@
 !SimPEG Example.ipynb
 !AEM Simulation.ipynb
 *.dat
+*.pkl
