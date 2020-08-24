@@ -213,6 +213,11 @@ class PHaem:
         xtx = Yaem[Yaem <= Yert[Yert.shape[0]-1]]
         ytx = np.zeros(xtx.shape)
         ztx = dat2.ALT.values[Yaem <= Yert[Yert.shape[0]-1]] + dat2.TOPO.values[Yaem <= Yert[Yert.shape[0]-1]]
+        ztx[4] = (ztx[3]+ztx[5])/2
+        ztx[10] = (ztx[9]+ztx[11])/2
+        ztx[21] = ztx[20] + (ztx[23]-ztx[20])/(xtx[23]-xtx[20])*(xtx[21]-xtx[20])
+        ztx[22] = ztx[20] + (ztx[23]-ztx[20])/(xtx[23]-xtx[20])*(xtx[22]-xtx[20])
+        ztx[31] = (ztx[32]+ztx[30])/2
 
         xrx = xtx
         yrx = ytx
@@ -324,23 +329,34 @@ class PHaem:
         self.t0 = t0w
         return
 
-    def plot_slice(self):
+    def plot_slice(self,figsize=(7,6),vmin=None,vmax=None):
         mpl.rcParams.update({"font.size": 12})
-        fig = plt.figure(figsize=(7, 6))
+        fig = plt.figure(figsize=figsize)
 
-        log_model = np.log10(self.model)
+        # log_model = np.log10(self.model)
+        log_model = self.model
 
         plotting_map = maps.InjectActiveCells(self.mesh, self.ind_active, np.nan)
 
         ax1 = fig.add_axes([0.13, 0.1, 0.6, 0.85])
-        self.mesh.plotSlice(
-            plotting_map * log_model,
-            normal="Y",
-            ax=ax1,
-            ind=int(self.mesh.hy.size / 2),
-            grid=True,
-            clim=(np.min(log_model), np.max(log_model)),
-        )
+        if vmin is None and vmax is None:
+            self.mesh.plotSlice(
+                plotting_map * log_model,
+                normal="Y",
+                ax=ax1,
+                ind=int(self.mesh.hy.size / 2),
+                grid=True,
+                clim=(np.min(log_model), np.max(log_model)),
+            )
+        else:
+            self.mesh.plotSlice(
+                plotting_map * log_model,
+                normal="Y",
+                ax=ax1,
+                ind=int(self.mesh.hy.size / 2),
+                grid=True,
+                clim=(vmin, vmax),
+            )
         ax1.set_title("Conductivity Model at Y = 0 m")
 
         ax2 = fig.add_axes([0.75, 0.1, 0.05, 0.85])
